@@ -33,9 +33,23 @@ Aplikasi web **Al-Qur'an Digital Modern** yang dirancang khusus untuk kenyamanan
   - Ketika audio berputar, kartu ayat yang sedang dilantunkan otomatis disorot (*highlight*) dengan efek *glow* hijau zamrud/emas dan animasi bar equalizer `Misyari Membaca 🎵`.
   - **Auto-Scroll Halus**: Layar secara otomatis bergeser lembut ke tengah ayat yang sedang dibaca tanpa perlu di-scroll manual.
   - **Auto-Play Next**: Berlanjut otomatis dari ayat ke ayat hingga akhir surah.
-  - **Repeat Ayah (Ulangi Ayat)**: Tombol pengulangan ayat per ayat, sangat cocok untuk hafalan (*tahfidz*) dan perbaikan tajwid (*tahsin*).
   - **Pengatur Kecepatan Audio**: Pilihan 0.75x (Tartil lambat untuk belajar), 1.0x (Normal), 1.25x, dan 1.5x.
   - **Putar Langsung dari Ayat Mana Saja**: Setiap ayat memiliki tombol putar audio mandiri.
+
+---
+
+### 3. 🎯 Mode Hafalan & Muroja'ah (Tahfidz Fleksibel)
+- **Pengulangan Per Ayat (Bebas Berapa Pun)**:
+  - Tentukan jumlah putaran untuk tiap ayat: `1x`, `3x`, `5x`, `7x`, `10x`, `20x`, `40x`, atau angka berapa pun yang Anda ketik, hingga opsi `∞ Terus Menerus` (loop tanpa batas).
+- **Pengulangan Rentang Ayat (Dari Ayat X s/d Ayat Y)**:
+  - Tentukan batas awal dan akhir ayat yang ingin dihafal (misal Ayat 1 sampai 5).
+  - Tentukan jumlah putaran blok rentang (misal diulang 3x atau 5x putaran penuh).
+  - Dilengkapi tombol preset cepat: `Ayat Ini`, `+3 Ayat`, `+5 Ayat`, `1 Surah Penuh`.
+- **Jeda Waktu Antar Ayat**:
+  - Pilihan jeda waktu (0 detik, 1 detik, 2 detik, 3 detik) untuk memberi waktu pembaca menirukan dan melafalkan hafalan.
+- **Indikator Live Counter**:
+  - Bilah status interaktif di pemutar audio menampilkan: `Ayat 1-5 • Ayat 2 (Putaran 2/3) • Blok (1/2)`.
+  - Tombol pintas 🎯 di samping setiap kartu ayat untuk langsung membuka mode hafalan ayat tersebut.
 
 ---
 

@@ -354,7 +354,7 @@ const App = {
               </span>
             </div>
 
-            <!-- Tombol Aksi Ayat: Play, Salin, Bookmark -->
+            <!-- Tombol Aksi Ayat: Play, Hafalan, Salin, Bookmark -->
             <div class="flex items-center space-x-1">
               <button
                 onclick="App.playAyah(${surahId}, ${ayahNum})"
@@ -362,6 +362,14 @@ const App = {
                 class="p-2 rounded-xl text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </button>
+
+              <button
+                onclick="App.openTahfidzModal(${ayahNum})"
+                title="Hafalkan ayat ini (Ulangi bacaan)"
+                class="p-2 rounded-xl text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
               </button>
 
               <button
@@ -565,6 +573,11 @@ const App = {
         title.innerText = `${meta.name} : Ayat ${ayah}`;
       }
     };
+
+    // Callback khusus mode pengulangan hafalan (Tahfidz)
+    quranAudio.onTahfidzUpdate = (tahfidzState) => {
+      this.updateTahfidzUI(tahfidzState);
+    };
   },
 
   playSurahFromBeginning() {
@@ -640,6 +653,130 @@ const App = {
       setTimeout(() => {
         el.classList.remove('ring-2', 'ring-emerald-500');
       }, 2000);
+    }
+  },
+
+  /* ========================================================
+     FITUR MODE HAFALAN & MUROJA'AH (TAHFIDZ)
+     ======================================================== */
+  openTahfidzModal(targetAyah = null) {
+    const modal = document.getElementById('tahfidz-modal');
+    if (!modal) return;
+
+    const total = this.state.currentSurahData?.numberOfAyahs || 7;
+    const startVal = targetAyah || quranAudio.currentAyah || 1;
+    const endVal = targetAyah || quranAudio.currentAyah || 1;
+
+    const startInput = document.getElementById('tahfidz-start-ayah');
+    const endInput = document.getElementById('tahfidz-end-ayah');
+    const maxHint = document.getElementById('tahfidz-total-ayahs-hint');
+    const surahNameHint = document.getElementById('tahfidz-surah-name-hint');
+
+    if (startInput) {
+      startInput.value = startVal;
+      startInput.max = total;
+    }
+    if (endInput) {
+      endInput.value = endVal;
+      endInput.max = total;
+    }
+    if (maxHint) maxHint.innerText = `Maks: ${total} Ayat`;
+    if (surahNameHint) {
+      const meta = this.state.surahList.find(s => s.number === this.state.currentSurahId);
+      surahNameHint.innerText = meta ? `${meta.number}. ${meta.name}` : `Surah ${this.state.currentSurahId}`;
+    }
+
+    modal.classList.remove('hidden');
+  },
+
+  closeTahfidzModal() {
+    const modal = document.getElementById('tahfidz-modal');
+    if (modal) modal.classList.add('hidden');
+  },
+
+  setTahfidzQuickRange(type) {
+    const total = this.state.currentSurahData?.numberOfAyahs || 7;
+    const startInput = document.getElementById('tahfidz-start-ayah');
+    const endInput = document.getElementById('tahfidz-end-ayah');
+    if (!startInput || !endInput) return;
+
+    let start = parseInt(startInput.value) || 1;
+    if (type === 'single') {
+      endInput.value = start;
+    } else if (type === 'plus3') {
+      endInput.value = Math.min(total, start + 2);
+    } else if (type === 'plus5') {
+      endInput.value = Math.min(total, start + 4);
+    } else if (type === 'plus10') {
+      endInput.value = Math.min(total, start + 9);
+    } else if (type === 'full') {
+      startInput.value = 1;
+      endInput.value = total;
+    }
+  },
+
+  setTahfidzQuickRepeat(val, targetField) {
+    const field = document.getElementById(targetField);
+    if (field) {
+      field.value = val;
+    }
+  },
+
+  startTahfidzFromModal() {
+    const startInput = document.getElementById('tahfidz-start-ayah');
+    const endInput = document.getElementById('tahfidz-end-ayah');
+    const repAyahInput = document.getElementById('tahfidz-repeat-ayah');
+    const repRangeInput = document.getElementById('tahfidz-repeat-range');
+    const delayInput = document.getElementById('tahfidz-delay-select');
+
+    const start = parseInt(startInput?.value) || 1;
+    const end = parseInt(endInput?.value) || start;
+    const repAyah = repAyahInput?.value || 3;
+    const repRange = repRangeInput?.value || 1;
+    const delay = parseInt(delayInput?.value) || 0;
+
+    quranAudio.startTahfidz({
+      startAyah: start,
+      endAyah: end,
+      repeatPerAyah: repAyah,
+      repeatRange: repRange,
+      delayBetweenAyahs: delay
+    });
+
+    this.closeTahfidzModal();
+    this.showToast(`🎯 Mode Hafalan: Ayat ${start} s/d ${end}`, 'success');
+  },
+
+  stopTahfidz() {
+    quranAudio.stopTahfidz();
+    this.showToast('Mode Hafalan dihentikan', 'info');
+  },
+
+  updateTahfidzUI(tahfidzState) {
+    const activeBar = document.getElementById('tahfidz-active-bar');
+    if (!activeBar) return;
+
+    if (!tahfidzState || !tahfidzState.active) {
+      activeBar.classList.add('hidden');
+      return;
+    }
+
+    activeBar.classList.remove('hidden');
+
+    const rangeInfo = document.getElementById('tahfidz-status-range');
+    const ayahRepeatInfo = document.getElementById('tahfidz-status-ayah-repeat');
+    const rangeRepeatInfo = document.getElementById('tahfidz-status-range-repeat');
+
+    if (rangeInfo) {
+      rangeInfo.innerText = `Ayat ${tahfidzState.startAyah} - ${tahfidzState.endAyah}`;
+    }
+    if (ayahRepeatInfo) {
+      const repAyahMax = tahfidzState.isPerAyahInfinite ? '∞' : `${tahfidzState.repeatPerAyah}x`;
+      ayahRepeatInfo.innerText = `Ayat ${tahfidzState.currentAyah} (Putaran ${tahfidzState.currentAyahRepeatCount}/${repAyahMax})`;
+    }
+    if (rangeRepeatInfo) {
+      const repRangeMax = tahfidzState.isRangeInfinite ? '∞' : `${tahfidzState.repeatRange}x`;
+      rangeRepeatInfo.innerText = `Blok: (${tahfidzState.currentRangeRepeatCount}/${repRangeMax})`;
     }
   },
 
@@ -906,6 +1043,33 @@ const App = {
     if (closeSettingsBtn && settingsDrawer) {
       closeSettingsBtn.addEventListener('click', () => {
         settingsDrawer.classList.add('hidden');
+      });
+    }
+
+    // Modal Mode Hafalan (Tahfidz)
+    const tahfidzBtn = document.getElementById('open-tahfidz-btn');
+    const closeTahfidzBtn = document.getElementById('close-tahfidz-btn');
+    const startTahfidzBtn = document.getElementById('start-tahfidz-btn');
+    const stopTahfidzBtn = document.getElementById('stop-tahfidz-btn');
+
+    if (tahfidzBtn) {
+      tahfidzBtn.addEventListener('click', () => {
+        this.openTahfidzModal();
+      });
+    }
+    if (closeTahfidzBtn) {
+      closeTahfidzBtn.addEventListener('click', () => {
+        this.closeTahfidzModal();
+      });
+    }
+    if (startTahfidzBtn) {
+      startTahfidzBtn.addEventListener('click', () => {
+        this.startTahfidzFromModal();
+      });
+    }
+    if (stopTahfidzBtn) {
+      stopTahfidzBtn.addEventListener('click', () => {
+        this.stopTahfidz();
       });
     }
 

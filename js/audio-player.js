@@ -17,10 +17,23 @@ class QuranAudioPlayer {
     this.volume = 1.0;
     this.isMuted = false;
 
+    // Mode Hafalan & Muroja'ah (Tahfidz)
+    this.tahfidzMode = false;
+    this.tahfidzConfig = {
+      startAyah: 1,
+      endAyah: 1,
+      repeatPerAyah: 1,  // Angka bebas atau Infinity
+      repeatRange: 1,    // Angka bebas atau Infinity
+      delayBetweenAyahs: 0 // Jeda detik antar ayat
+    };
+    this.currentAyahRepeatCount = 1;
+    this.currentRangeRepeatCount = 1;
+
     // Callbacks untuk UI update
     this.onStateChange = null;
     this.onTimeUpdate = null;
     this.onAyahChange = null;
+    this.onTahfidzUpdate = null;
 
     this.initAudioListeners();
   }
@@ -187,6 +200,11 @@ class QuranAudioPlayer {
    * Penanganan saat satu ayat selesai berbunyi
    */
   handleAyahEnded() {
+    if (this.tahfidzMode) {
+      this.handleTahfidzAyahEnded();
+      return;
+    }
+
     if (this.repeatCurrentAyah) {
       // Ulangi ayat yang sama
       this.audio.currentTime = 0;
@@ -201,6 +219,144 @@ class QuranAudioPlayer {
       this.highlightCurrentAyah(false);
       if (this.onStateChange) this.onStateChange(this.getState());
     }
+  }
+
+  /**
+   * Logika Pengulangan Khusus Mode Hafalan (Tahfidz & Muroja'ah)
+   */
+  handleTahfidzAyahEnded() {
+    const { startAyah, endAyah, repeatPerAyah, repeatRange, delayBetweenAyahs } = this.tahfidzConfig;
+
+    // 1. Cek apakah ayat ini masih perlu diulang
+    if (this.currentAyahRepeatCount < repeatPerAyah) {
+      this.currentAyahRepeatCount++;
+      if (this.onTahfidzUpdate) this.onTahfidzUpdate(this.getTahfidzState());
+      
+      const replaySame = () => {
+        this.audio.currentTime = 0;
+        this.audio.play().catch(e => console.warn(e));
+      };
+
+      if (delayBetweenAyahs > 0) {
+        setTimeout(replaySame, delayBetweenAyahs * 1000);
+      } else {
+        replaySame();
+      }
+      return;
+    }
+
+    // Target putaran ayat ini selesai, reset ke 1
+    this.currentAyahRepeatCount = 1;
+
+    // 2. Cek apakah masih ada ayat berikutnya dalam rentang hafalan
+    if (this.currentAyah < endAyah) {
+      const nextA = this.currentAyah + 1;
+      if (this.onTahfidzUpdate) this.onTahfidzUpdate(this.getTahfidzState());
+
+      const playNext = () => {
+        this.playAyah(this.currentSurah, nextA, this.totalAyahs);
+      };
+
+      if (delayBetweenAyahs > 0) {
+        setTimeout(playNext, delayBetweenAyahs * 1000);
+      } else {
+        playNext();
+      }
+      return;
+    }
+
+    // 3. Telah sampai di ayat terakhir rentang (currentAyah === endAyah)
+    // Cek apakah seluruh rangkaian rentang perlu diulang lagi
+    if (this.currentRangeRepeatCount < repeatRange) {
+      this.currentRangeRepeatCount++;
+      if (this.onTahfidzUpdate) this.onTahfidzUpdate(this.getTahfidzState());
+
+      if (typeof window.showToast === 'function') {
+        window.showToast(`Memulai putaran blok rentang ke-${this.currentRangeRepeatCount}...`, 'info');
+      }
+
+      const loopBlock = () => {
+        this.playAyah(this.currentSurah, startAyah, this.totalAyahs);
+      };
+
+      if (delayBetweenAyahs > 0) {
+        setTimeout(loopBlock, delayBetweenAyahs * 1000);
+      } else {
+        loopBlock();
+      }
+      return;
+    }
+
+    // 4. Semua target hafalan telah selesai dicapai!
+    this.isPlaying = false;
+    this.tahfidzMode = false;
+    this.highlightCurrentAyah(false);
+    if (this.onTahfidzUpdate) this.onTahfidzUpdate(null);
+    if (this.onStateChange) this.onStateChange(this.getState());
+
+    if (typeof window.showToast === 'function') {
+      window.showToast('Alhamdulillah! Target sesi hafalan telah tuntas.', 'success');
+    }
+  }
+
+  /**
+   * Memulai Mode Hafalan (Tahfidz)
+   */
+  startTahfidz(config) {
+    this.tahfidzMode = true;
+    const start = Math.max(1, parseInt(config.startAyah) || 1);
+    let end = parseInt(config.endAyah) || start;
+    if (end < start) end = start;
+    if (this.totalAyahs && end > this.totalAyahs) end = this.totalAyahs;
+
+    const repAyah = config.repeatPerAyah === 'infinite' ? Infinity : Math.max(1, parseInt(config.repeatPerAyah) || 1);
+    const repRange = config.repeatRange === 'infinite' ? Infinity : Math.max(1, parseInt(config.repeatRange) || 1);
+    const delay = Math.max(0, parseInt(config.delayBetweenAyahs) || 0);
+
+    this.tahfidzConfig = {
+      startAyah: start,
+      endAyah: end,
+      repeatPerAyah: repAyah,
+      repeatRange: repRange,
+      delayBetweenAyahs: delay
+    };
+
+    this.currentAyahRepeatCount = 1;
+    this.currentRangeRepeatCount = 1;
+
+    // Putar mulai dari ayat awal hafalan
+    this.playAyah(this.currentSurah, start, this.totalAyahs);
+
+    if (this.onTahfidzUpdate) this.onTahfidzUpdate(this.getTahfidzState());
+    if (this.onStateChange) this.onStateChange(this.getState());
+  }
+
+  /**
+   * Menghentikan Mode Hafalan
+   */
+  stopTahfidz() {
+    this.tahfidzMode = false;
+    this.currentAyahRepeatCount = 1;
+    this.currentRangeRepeatCount = 1;
+    if (this.onTahfidzUpdate) this.onTahfidzUpdate(null);
+    if (this.onStateChange) this.onStateChange(this.getState());
+  }
+
+  getTahfidzState() {
+    if (!this.tahfidzMode) return null;
+    return {
+      active: true,
+      surah: this.currentSurah,
+      currentAyah: this.currentAyah,
+      startAyah: this.tahfidzConfig.startAyah,
+      endAyah: this.tahfidzConfig.endAyah,
+      repeatPerAyah: this.tahfidzConfig.repeatPerAyah,
+      repeatRange: this.tahfidzConfig.repeatRange,
+      currentAyahRepeatCount: this.currentAyahRepeatCount,
+      currentRangeRepeatCount: this.currentRangeRepeatCount,
+      isPerAyahInfinite: this.tahfidzConfig.repeatPerAyah === Infinity,
+      isRangeInfinite: this.tahfidzConfig.repeatRange === Infinity
+    };
   }
 
   /**
@@ -303,7 +459,9 @@ class QuranAudioPlayer {
     this.audio.pause();
     this.audio.currentTime = 0;
     this.isPlaying = false;
+    this.tahfidzMode = false;
     this.highlightCurrentAyah(false);
+    if (this.onTahfidzUpdate) this.onTahfidzUpdate(null);
     if (this.onStateChange) this.onStateChange(this.getState());
   }
 
@@ -318,7 +476,9 @@ class QuranAudioPlayer {
       autoPlayNext: this.autoPlayNext,
       autoScroll: this.autoScroll,
       volume: this.volume,
-      isMuted: this.isMuted
+      isMuted: this.isMuted,
+      tahfidzMode: this.tahfidzMode,
+      tahfidzState: this.getTahfidzState()
     };
   }
 }
