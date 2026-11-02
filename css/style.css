@@ -1,0 +1,230 @@
+/* ========================================================
+   QURAN DIGITAL - MODERN ISLAMIC THEME STYLESHEET
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Scheherazade+New:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-emerald: #059669;
+  --primary-dark: #064e3b;
+  --primary-light: #10b981;
+  --accent-gold: #d97706;
+  --accent-gold-light: #fbbf24;
+  --font-arabic: 'Amiri Quran', 'Scheherazade New', 'Traditional Arabic', serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --arabic-size: 28px;
+  --trans-size: 15px;
+}
+
+body {
+  font-family: var(--font-body);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Arabic Quranic Text Typography */
+.quran-arabic-text {
+  font-family: var(--font-arabic);
+  font-size: var(--arabic-size);
+  line-height: 2.3;
+  direction: rtl;
+  text-align: right;
+  word-spacing: 4px;
+}
+
+.ayah-end-ornament {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  margin: 0 6px;
+  border-radius: 50%;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  vertical-align: middle;
+  border: 1.5px solid currentColor;
+  position: relative;
+}
+
+/* ========================================================
+   ACTIVE AYAH (FOLLOW-ALONG AUDIO SYNC)
+   ======================================================== */
+.ayah-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1.5px solid transparent;
+}
+
+.ayah-card.playing-now {
+  border-color: #10b981 !important;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(217, 119, 6, 0.05) 100%) !important;
+  box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.3), 0 0 0 1px rgba(16, 185, 129, 0.2);
+  transform: translateY(-2px);
+}
+
+.dark .ayah-card.playing-now {
+  border-color: #059669 !important;
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.16) 0%, rgba(217, 119, 6, 0.1) 100%) !important;
+  box-shadow: 0 12px 35px -10px rgba(5, 150, 105, 0.4), 0 0 0 1px rgba(52, 211, 153, 0.3);
+}
+
+/* Wave Equalizer Animation for Active Ayah */
+.equalizer-bar {
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  background-color: #10b981;
+  border-radius: 2px;
+  margin: 0 1.5px;
+  animation: equalize 1s infinite ease-in-out;
+}
+
+.equalizer-bar:nth-child(2) {
+  animation-delay: 0.2s;
+  height: 18px;
+}
+.equalizer-bar:nth-child(3) {
+  animation-delay: 0.4s;
+  height: 12px;
+}
+.equalizer-bar:nth-child(4) {
+  animation-delay: 0.1s;
+  height: 16px;
+}
+
+@keyframes equalize {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.dark .glass-panel {
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, 0.6);
+}
+
+/* Bismillah Banner Style */
+.bismillah-card {
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0) 70%);
+}
+
+/* Audio Player Range Slider Styling */
+input[type="range"] {
+  accent-color: #059669;
+}
+
+/* Slide in from right (for Tajweed Guide & Settings Drawers) */
+.drawer-enter {
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drawer-enter-active {
+  transform: translateX(0);
+}
+
+/* Toast Container */
+#toast-container {
+  position: fixed;
+  bottom: calc(90px + env(safe-area-inset-bottom, 12px));
+  right: 16px;
+  left: 16px;
+  max-width: 400px;
+  margin: 0 auto;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
+  #toast-container {
+    left: auto;
+    right: 20px;
+  }
+}
+
+.toast {
+  pointer-events: auto;
+  animation: slideInToast 0.3s ease forwards;
+}
+
+@keyframes slideInToast {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ========================================================
+   OPTIMASI KHUSUS MOBILE (SMARTPHONE UI / UX)
+   ======================================================== */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hilangkan scrollbar namun tetap bisa di-scroll (untuk chip warna tajwid mobile) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Penyesuaian Ruang Layar & Safe Area pada HP */
+@media (max-width: 640px) {
+  :root {
+    --arabic-size: 25px;
+    --trans-size: 14px;
+  }
+
+  .quran-arabic-text {
+    line-height: 2.2;
+    word-spacing: 3px;
+  }
+
+  body {
+    padding-bottom: calc(105px + env(safe-area-inset-bottom, 12px));
+  }
+
+  #floating-audio-player {
+    padding-bottom: env(safe-area-inset-bottom, 8px);
+  }
+}
+
+

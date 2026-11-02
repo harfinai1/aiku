@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Al-Qur'an Digital - Tajwid Berwarna & Murottal Syaikh Misyari</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            emerald: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22',
+            },
+            gold: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+              700: '#b45309',
+            }
+          },
+          fontFamily: {
+            arabic: ['"Amiri Quran"', '"Scheherazade New"', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Stylesheets -->
+  <link rel="stylesheet" href="css/tajweed.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- ========================================================
+       TOP NAVBAR (DESAIN KHUSUS MOBILE & DESKTOP)
+       ======================================================== -->
+  <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800/90 shadow-sm transition">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
+      
+      <!-- Brand & Tombol Buka Daftar Surah -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Tombol Menu Surah untuk Layar HP -->
+        <button
+          id="mobile-sidebar-toggle"
+          aria-label="Pilih Surah"
+          class="p-2 sm:p-2.5 rounded-xl text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 lg:bg-transparent border border-emerald-500/20 lg:border-0 hover:bg-emerald-100 dark:hover:bg-slate-800 transition active:scale-95 flex items-center space-x-1.5"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          <span class="text-xs font-bold lg:hidden">Surah</span>
+        </button>
+
+        <!-- Logo & Nama Aplikasi -->
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-emerald-700 via-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 flex-shrink-0">
+            <svg class="w-5 h-5 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19 2H6c-1.2 0-2.2.9-2.4 2.1L3.1 8c-.1.5 0 1 .3 1.4.3.4.8.6 1.3.6h.3c.6 0 1.2-.2 1.6-.7l1.4-1.6V19c0 1.7 1.3 3 3 3h9c1.7 0 3-1.3 3-3V5c0-1.7-1.3-3-3-3zm1 17c0 .6-.4 1-1 1H8c-.6 0-1-.4-1-1V5c0-.6.4-1 1-1h11c.6 0 1 .4 1 1v14z"/>
+              <path d="M10 7h7v2h-7zm0 4h7v2h-7zm0 4h5v2h-5z"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-sm sm:text-base font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center">
+              Al-Qur'an Digital
+              <span class="ml-1.5 px-1.5 py-0.5 text-[9px] uppercase font-bold tracking-wider rounded-md bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-500/20">
+                Tajwid
+              </span>
+            </h1>
+            <p class="text-[10px] text-slate-400 dark:text-slate-500 hidden sm:block">Kemenag RI • Murottal Syaikh Misyari Rasyid</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons: Terakhir Dibaca, Panduan Tajwid, Pengaturan, Tema -->
+      <div class="flex items-center space-x-1.5 sm:space-x-2">
+        <!-- Last Read Badge -->
+        <div id="last-read-badge" class="hidden sm:flex items-center px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/30"></div>
+
+        <!-- Tombol Panduan Tajwid (Mobile Friendly Pill) -->
+        <button
+          id="open-tajweed-legend-btn"
+          aria-label="Panduan Tajwid"
+          class="flex items-center space-x-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition active:scale-95 shadow-sm"
+        >
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-[11px] sm:text-xs">Tajwid</span>
+        </button>
+
+        <!-- Tombol Pengaturan Tampilan -->
+        <button
+          id="open-settings-btn"
+          title="Pengaturan Bacaan & Ukuran Font"
+          aria-label="Pengaturan"
+          class="p-2 sm:p-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        </button>
+
+        <!-- Dark / Light Mode Switcher -->
+        <button
+          id="theme-toggle-btn"
+          title="Ubah Tema Gelap / Terang"
+          aria-label="Tema"
+          class="p-2 sm:p-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95"
+        >
+          <span id="theme-toggle-icon">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+          </span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================================
+       MAIN APP LAYOUT (MOBILE OPTIMIZED CONTAINER)
+       ======================================================== -->
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 w-full flex-grow flex gap-6">
+
+    <!-- DRAWER / SIDEBAR DAFTAR SURAH (114 SURAH) -->
+    <aside
+      id="sidebar-panel"
+      class="hidden lg:flex fixed lg:static inset-0 lg:inset-auto z-50 lg:z-auto flex-col lg:w-80 flex-shrink-0"
+    >
+      <!-- Backdrop Gelap Khusus Mobile (Klik untuk menutup) -->
+      <div
+        class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm lg:hidden transition-opacity"
+        onclick="document.getElementById('sidebar-panel').classList.add('hidden')"
+      ></div>
+
+      <!-- Kartu Konten Daftar Surah -->
+      <div class="relative z-10 w-full max-w-[320px] sm:max-w-sm h-full bg-white dark:bg-slate-900 border-r lg:border border-slate-200 dark:border-slate-800 lg:rounded-2xl p-4 shadow-2xl lg:shadow-sm flex flex-col lg:h-[calc(100vh-170px)] lg:sticky lg:top-20">
+        
+        <!-- Header Drawer Mobile -->
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
+          <div class="flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <h3 class="font-bold text-sm sm:text-base text-slate-800 dark:text-slate-100">Daftar Surah (114)</h3>
+          </div>
+          <button id="close-sidebar-btn" aria-label="Tutup Menu" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+
+        <!-- Kolom Pencarian Cepat Surah -->
+        <div class="relative mb-3">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input
+            id="surah-search-input"
+            type="text"
+            placeholder="Cari surah, arti, nomor..."
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl text-xs bg-slate-100 dark:bg-slate-800/80 border border-transparent focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition text-slate-800 dark:text-slate-100 placeholder-slate-400"
+          >
+        </div>
+
+        <!-- Filter Tab Kategori Surah -->
+        <div class="grid grid-cols-4 gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl mb-3 text-[11px] font-medium">
+          <button data-category="all" class="surah-filter-btn py-1.5 rounded-lg text-center transition bg-emerald-600 text-white font-semibold">Semua</button>
+          <button data-category="makkiyah" class="surah-filter-btn py-1.5 rounded-lg text-center transition text-slate-600 dark:text-slate-400 hover:text-emerald-600">Makki</button>
+          <button data-category="madaniyah" class="surah-filter-btn py-1.5 rounded-lg text-center transition text-slate-600 dark:text-slate-400 hover:text-emerald-600">Madani</button>
+          <button data-category="popular" class="surah-filter-btn py-1.5 rounded-lg text-center transition text-slate-600 dark:text-slate-400 hover:text-emerald-600">Pilihan</button>
+        </div>
+
+        <!-- Container List Surah dengan Touch Scroll Halus -->
+        <div id="surah-list-container" class="flex-grow overflow-y-auto space-y-1 pr-1 overscroll-contain">
+          <!-- Diisi via App.renderSurahList() -->
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- KONTEN UTAMA: BACAAN SURAH & AYAT BERTAJWID -->
+    <main class="flex-1 min-w-0">
+
+      <!-- Surah Header Card (Touch Optimized Banner) -->
+      <section class="p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-800 text-white shadow-lg mb-4 sm:mb-6 relative overflow-hidden">
+        <!-- Background Islamic Calligraphy Watermark -->
+        <div class="absolute -right-8 -bottom-8 opacity-10 pointer-events-none">
+          <svg class="w-60 h-60 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4">
+          <div>
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase bg-white/20 backdrop-blur-md mb-1.5">
+              Mushaf Standar Kemenag RI
+            </span>
+            <h2 id="active-surah-title" class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight">
+              1. Al-Fatihah (الفَاتِحَة)
+            </h2>
+            <p id="active-surah-info" class="text-emerald-100 text-xs sm:text-sm mt-0.5">
+              Pembukaan • 7 Ayat • Golongan Makkiyah
+            </p>
+          </div>
+
+          <!-- Quick Action Buttons: Putar & Jump to Ayah -->
+          <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 pt-1 sm:pt-0">
+            <!-- Putar Full Murottal Syaikh Misyari -->
+            <button
+              onclick="App.playSurahFromBeginning()"
+              class="flex-1 sm:flex-none justify-center px-4 py-2.5 rounded-xl bg-white text-emerald-800 font-bold text-xs hover:bg-emerald-50 active:scale-95 transition shadow-md flex items-center space-x-2"
+            >
+              <svg class="w-4 h-4 text-emerald-600 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+              <span>Putar Syaikh Misyari</span>
+            </button>
+
+            <!-- Jump to Ayah Dropdown -->
+            <select
+              id="jump-ayah-select"
+              class="flex-1 sm:flex-none px-3 py-2.5 rounded-xl bg-white/15 backdrop-blur-md border border-white/25 text-white text-xs font-semibold focus:outline-none focus:bg-emerald-900 transition cursor-pointer"
+            >
+              <option value="" class="text-slate-900 bg-white">Lompat Ayat...</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Quick Tajweed Color Chips (Bisa di-swipe horizontal pada HP) -->
+        <div class="mt-4 pt-3.5 border-t border-white/15 flex items-center space-x-3 overflow-x-auto no-scrollbar text-xs text-white/95 pb-0.5">
+          <span class="font-bold flex items-center text-amber-300 flex-shrink-0">
+            <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+            Warna Tajwid:
+          </span>
+          <span class="flex items-center space-x-1.5 flex-shrink-0 bg-white/10 px-2 py-0.5 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span><span>Ghunnah</span></span>
+          <span class="flex items-center space-x-1.5 flex-shrink-0 bg-white/10 px-2 py-0.5 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span><span>Ikhfa</span></span>
+          <span class="flex items-center space-x-1.5 flex-shrink-0 bg-white/10 px-2 py-0.5 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span><span>Qalqalah</span></span>
+          <span class="flex items-center space-x-1.5 flex-shrink-0 bg-white/10 px-2 py-0.5 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-teal-400"></span><span>Idgham</span></span>
+          <span class="flex items-center space-x-1.5 flex-shrink-0 bg-white/10 px-2 py-0.5 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span><span>Iqlab</span></span>
+          <span class="flex items-center space-x-1.5 flex-shrink-0 bg-white/10 px-2 py-0.5 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-red-400"></span><span>Mad Wajib/Lazim</span></span>
+          <span class="flex items-center space-x-1.5 flex-shrink-0 bg-white/10 px-2 py-0.5 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-orange-400"></span><span>Mad Jaiz</span></span>
+          <span class="flex items-center space-x-1.5 flex-shrink-0 bg-white/10 px-2 py-0.5 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-sky-300"></span><span>Mad Asli</span></span>
+        </div>
+      </section>
+
+      <!-- Container Ayat-Ayat -->
+      <section id="ayahs-container" class="space-y-3 sm:space-y-4">
+        <!-- Diisi secara dinamis oleh App.renderAyahs() -->
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- ========================================================
+       FLOATING AUDIO PLAYER BAR (DESAIN KHUSUS MOBILE & DESKTOP)
+       ======================================================== -->
+  <div
+    id="floating-audio-player"
+    class="fixed bottom-0 inset-x-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/90 dark:border-slate-800/90 shadow-2xl transition"
+  >
+    <!-- Full-Width Thin Progress Scrubber di Bagian Atas Player -->
+    <div class="w-full relative h-1 bg-slate-200 dark:bg-slate-800">
+      <input
+        id="audio-progress-bar"
+        type="range"
+        min="0"
+        max="100"
+        value="0"
+        aria-label="Timeline Audio"
+        class="absolute -top-1.5 inset-x-0 w-full h-4 opacity-0 z-20 cursor-pointer"
+      >
+      <!-- Visual Bar terisi dinamis via CSS atau sinkronisasi -->
+      <div id="audio-progress-visual" class="h-full bg-emerald-500 rounded-r-full transition-all duration-150" style="width: 0%;"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 sm:py-3 flex flex-col md:flex-row items-center justify-between gap-2 sm:gap-3">
+      
+      <!-- Baris Utama Player Mobile: Info Ayat & Kontrol -->
+      <div class="flex items-center justify-between w-full md:w-auto md:flex-1 gap-2">
+        
+        <!-- Info Qari & Ayat Aktif -->
+        <div class="flex items-center space-x-2.5 min-w-0 flex-1 md:max-w-xs">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white flex-shrink-0 shadow-md">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+          </div>
+          <div class="truncate">
+            <h4 id="player-surah-title" class="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100 truncate">
+              Al-Fatihah : Ayat 1
+            </h4>
+            <div class="flex items-center space-x-2 text-[10px] sm:text-[11px] text-emerald-600 dark:text-emerald-400">
+              <span class="font-medium truncate">Syaikh Misyari Rasyid</span>
+              <span>•</span>
+              <span id="audio-time-display" class="font-mono text-slate-400 dark:text-slate-500">00:00 / 00:00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol Kontrol Pemutaran Audio -->
+        <div class="flex items-center space-x-1 sm:space-x-3 flex-shrink-0">
+          
+          <!-- Sakelar Auto-Scroll Layar Mengikuti Bacaan -->
+          <button
+            id="player-autoscroll-btn"
+            title="Auto-Scroll Layar Mengikuti Ayat yang Dibaca"
+            aria-label="Auto Scroll"
+            class="p-1.5 sm:p-2 text-emerald-500 hover:text-emerald-600 active:scale-95 transition"
+          >
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+          </button>
+
+          <!-- Ulangi Ayat (Loop Tahfidz) -->
+          <button
+            id="player-repeat-btn"
+            title="Ulangi Ayat Ini (Loop Tahfidz)"
+            aria-label="Repeat Ayat"
+            class="p-1.5 sm:p-2 text-slate-400 hover:text-emerald-500 active:scale-95 transition"
+          >
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          </button>
+
+          <!-- Ayat Sebelumnya (Prev) -->
+          <button
+            id="player-prev-btn"
+            title="Ayat Sebelumnya"
+            aria-label="Prev Ayat"
+            class="p-1.5 sm:p-2 text-slate-600 dark:text-slate-300 hover:text-emerald-600 active:scale-95 transition"
+          >
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z"></path></svg>
+          </button>
+
+          <!-- Main Play / Pause Circle Button -->
+          <button
+            id="player-play-btn"
+            aria-label="Putar atau Jeda"
+            class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-emerald-600 text-white flex items-center justify-center hover:bg-emerald-700 active:scale-90 transition shadow-lg shadow-emerald-500/30"
+          >
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+          </button>
+
+          <!-- Ayat Selanjutnya (Next) -->
+          <button
+            id="player-next-btn"
+            title="Ayat Selanjutnya"
+            aria-label="Next Ayat"
+            class="p-1.5 sm:p-2 text-slate-600 dark:text-slate-300 hover:text-emerald-600 active:scale-95 transition"
+          >
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798L4.555 5.168z"></path></svg>
+          </button>
+
+          <!-- Pengaturan Kecepatan Audio (Tartil / Cepat) -->
+          <select
+            id="player-speed-select"
+            aria-label="Kecepatan Audio"
+            class="px-1.5 sm:px-2 py-1 rounded-lg text-[11px] sm:text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 focus:outline-none cursor-pointer"
+          >
+            <option value="0.75">0.75x</option>
+            <option value="1.0" selected>1.0x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+          </select>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL DRAWER: PANDUAN LENGKAP HUKUM TAJWID BERWARNA
+       ======================================================== -->
+  <div id="tajweed-legend-drawer" class="fixed inset-0 z-50 hidden">
+    <!-- Backdrop Blur -->
+    <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onclick="document.getElementById('tajweed-legend-drawer').classList.add('hidden')"></div>
+    
+    <!-- Drawer Panel Content (Full screen on small mobile, drawer on desktop) -->
+    <div class="absolute right-0 top-0 bottom-0 w-full sm:max-w-xl bg-white dark:bg-slate-900 shadow-2xl p-4 sm:p-6 overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 sm:pb-4 border-b border-slate-200 dark:border-slate-800 mb-4 sm:mb-5">
+        <div>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center">
+            <span class="w-3 h-3 rounded-full bg-emerald-500 mr-2"></span>
+            Panduan Lengkap Tajwid Berwarna
+          </h3>
+          <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Sesuai kaidah Mushaf Tajwid Standar Kemenag RI</p>
+        </div>
+        <button id="close-tajweed-legend-btn" aria-label="Tutup" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <!-- Content Legend yang dirender App.renderTajweedLegend() -->
+      <div id="tajweed-legend-content"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL DRAWER: PENGATURAN TAMPILAN
+       ======================================================== -->
+  <div id="settings-drawer" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onclick="document.getElementById('settings-drawer').classList.add('hidden')"></div>
+    
+    <div class="absolute right-0 top-0 bottom-0 w-full sm:max-w-md bg-white dark:bg-slate-900 shadow-2xl p-5 sm:p-6 overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 mb-5">
+        <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Pengaturan Bacaan</h3>
+        <button id="close-settings-btn" aria-label="Tutup" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <div class="space-y-5">
+        
+        <!-- Toggle Tajwid Berwarna -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h4 class="font-semibold text-sm text-slate-800 dark:text-slate-100">Tajwid Lengkap Berwarna</h4>
+            <p class="text-xs text-slate-400">Pewarnaan kaidah hukum tajwid pada ayat</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="tajweed-toggle" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+          </label>
+        </div>
+
+        <!-- Toggle Terjemahan Bahasa Indonesia -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h4 class="font-semibold text-sm text-slate-800 dark:text-slate-100">Terjemahan Indonesia</h4>
+            <p class="text-xs text-slate-400">Terjemahan resmi Kementerian Agama RI</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="translation-toggle" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+          </label>
+        </div>
+
+        <!-- Toggle Transliterasi Latin -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h4 class="font-semibold text-sm text-slate-800 dark:text-slate-100">Transliterasi Latin</h4>
+            <p class="text-xs text-slate-400">Ejaan latin untuk mempermudah bacaan</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="latin-toggle" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+          </label>
+        </div>
+
+        <!-- Slider Ukuran Font Arab -->
+        <div class="pt-4 border-t border-slate-200 dark:border-slate-800">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-semibold text-sm text-slate-800 dark:text-slate-100">Ukuran Font Arab</h4>
+            <span class="text-xs font-mono text-emerald-600 font-bold">20px - 44px</span>
+          </div>
+          <input
+            id="arabic-font-slider"
+            type="range"
+            min="20"
+            max="44"
+            value="28"
+            class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
+          >
+          <div class="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-right">
+            <span class="quran-arabic-text text-slate-800 dark:text-slate-100">
+              بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       TOOLTIP POPOVER TAJWID INTERAKTIF SAAT KLIK
+       ======================================================== -->
+  <div id="tajweed-popover" class="hidden"></div>
+
+  <!-- ========================================================
+       TOAST NOTIFICATION CONTAINER
+       ======================================================== -->
+  <div id="toast-container"></div>
+
+  <!-- ========================================================
+       SCRIPTS (TETAP SAMA TANPA DIUBAH)
+       ======================================================== -->
+  <script src="js/surah-list.js"></script>
+  <script src="js/precached-data.js"></script>
+  <script src="js/tajweed-parser.js"></script>
+  <script src="js/audio-player.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

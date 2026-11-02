@@ -1,0 +1,227 @@
+/**
+ * Tajweed Complete Color System & Typography
+ * Didesain sesuai kaidah Mushaf Tajwid Standar dengan kontras tinggi untuk Dark & Light Mode
+ */
+
+/* Default Tajweed Token Styling */
+.tj-token {
+  display: inline;
+  position: relative;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0 1px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tj-token:hover {
+  filter: brightness(1.15);
+  text-shadow: 0 0 8px currentColor;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+/* ========================================================
+   WARNA-WARNA TAJWID LENGKAP
+   ======================================================== */
+
+/* 1. Wasal & Huruf Gugur (Abu-abu lembut) */
+.tj-ham_wasl,
+.tj-silent,
+.tj-lam_shamsiyah {
+  color: #94a3b8 !important;
+  opacity: 0.85;
+}
+
+/* 2. Mad Asli / Thobi'i - 2 Harakat (Biru Langit) */
+.tj-madda_normal {
+  color: #0284c7 !important;
+  font-weight: 600;
+}
+.dark .tj-madda_normal {
+  color: #38bdf8 !important;
+}
+
+/* 3. Mad Jaiz Munfashil / 'Aridh Lissukun - 2, 4, 5 Harakat (Oranye Hangat) */
+.tj-madda_permissible {
+  color: #ea580c !important;
+  font-weight: 700;
+}
+.dark .tj-madda_permissible {
+  color: #fb923c !important;
+}
+
+/* 4. Mad Wajib Muttashil - 4-5 Harakat (Merah Menyala) */
+.tj-madda_obligatory {
+  color: #dc2626 !important;
+  font-weight: 700;
+}
+.dark .tj-madda_obligatory {
+  color: #f87171 !important;
+}
+
+/* 5. Mad Lazim Kilmi / Harfi - 6 Harakat Penuh (Merah Marun Pekat) */
+.tj-madda_necessary {
+  color: #991b1b !important;
+  font-weight: 800;
+  text-decoration: underline wavy #ef4444 1.5px;
+  text-underline-offset: 4px;
+}
+.dark .tj-madda_necessary {
+  color: #fca5a5 !important;
+  text-decoration: underline wavy #f87171 1.5px;
+}
+
+/* 6. Qalqalah - Memantul (Biru Elektrik) */
+.tj-qalqalah {
+  color: #2563eb !important;
+  font-weight: 700;
+}
+.dark .tj-qalqalah {
+  color: #60a5fa !important;
+}
+
+/* 7. Ghunnah Musyaddadah - Dengung 2 Harakat (Hijau Zamrud) */
+.tj-ghunnah {
+  color: #059669 !important;
+  font-weight: 700;
+}
+.dark .tj-ghunnah {
+  color: #34d399 !important;
+}
+
+/* 8. Ikhfa Haqiqi - Samar 2 Harakat (Ungu Mengkilap) */
+.tj-ikhfa {
+  color: #9333ea !important;
+  font-weight: 700;
+}
+.dark .tj-ikhfa {
+  color: #c084fc !important;
+}
+
+/* 9. Ikhfa Syafawi - Samar Bibir (Pink / Magenta) */
+.tj-ikhfa_shafawi {
+  color: #db2777 !important;
+  font-weight: 700;
+}
+.dark .tj-ikhfa_shafawi {
+  color: #f472b6 !important;
+}
+
+/* 10. Idgham Bighunnah - Melebur Berdengung (Teal / Hijau Laut) */
+.tj-idgham_ghunnah {
+  color: #0d9488 !important;
+  font-weight: 700;
+}
+.dark .tj-idgham_ghunnah {
+  color: #2dd4bf !important;
+}
+
+/* 11. Idgham Bilaghunnah - Melebur Tanpa Dengung (Hijau Olive / Lime) */
+.tj-idgham_no_ghunnah {
+  color: #65a30d !important;
+  font-weight: 700;
+}
+.dark .tj-idgham_no_ghunnah {
+  color: #a3e635 !important;
+}
+
+/* 12. Idgham Syafawi / Mimi (Hijau Segar) */
+.tj-idgham_shafawi {
+  color: #16a34a !important;
+  font-weight: 700;
+}
+.dark .tj-idgham_shafawi {
+  color: #4ade80 !important;
+}
+
+/* 13. Iqlab - Ditukar ke Mim (Biru Tosca / Cyan) */
+.tj-iqlab {
+  color: #0891b2 !important;
+  font-weight: 700;
+}
+.dark .tj-iqlab {
+  color: #22d3ee !important;
+}
+
+/* 14. Idgham Mutajanisain / Mutaqaribain (Abu-abu Tua / Slate) */
+.tj-idgham_mutajanisayn {
+  color: #475569 !important;
+  font-weight: 600;
+}
+.dark .tj-idgham_mutajanisayn {
+  color: #94a3b8 !important;
+}
+
+/* ========================================================
+   MODE TAJWID NONAKTIF (BACAAN POLOS)
+   ======================================================== */
+.tajweed-disabled .tj-token {
+  color: inherit !important;
+  font-weight: inherit !important;
+  text-decoration: none !important;
+  cursor: default;
+}
+
+/* ========================================================
+   FILTER ATURAN TAJWID (FOCUS MODE)
+   ======================================================== */
+.tajweed-filter-active .tj-token:not(.tj-filtered-target) {
+  opacity: 0.3;
+  filter: grayscale(0.8);
+}
+
+.tajweed-filter-active .tj-filtered-target {
+  animation: pulseHighlight 1.5s infinite;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.4);
+  border-radius: 4px;
+}
+
+@keyframes pulseHighlight {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 6px currentColor); }
+  100% { transform: scale(1); }
+}
+
+/* ========================================================
+   TOOLTIP TAJWID INTERAKTIF (POPUP PENJELASAN)
+   ======================================================== */
+#tajweed-popover {
+  position: fixed;
+  z-index: 9999;
+  max-width: 320px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-family: system-ui, -apple-system, sans-serif;
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: auto;
+}
+
+.dark #tajweed-popover {
+  background: rgba(17, 24, 39, 0.96);
+  border-color: rgba(52, 211, 153, 0.25);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.5);
+  color: #f3f4f6;
+}
+
+#tajweed-popover.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+}
+
+/* Responsif Mobile untuk Popover Penjelasan Tajwid */
+@media (max-width: 640px) {
+  #tajweed-popover {
+    left: 14px !important;
+    right: 14px !important;
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
+    top: auto !important;
+    max-width: none !important;
+    border-radius: 18px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.35);
+  }
+}
+
